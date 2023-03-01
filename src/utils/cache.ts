@@ -11,7 +11,9 @@ class Cache {
   }
 
   setCache(key: string, value: any) {
-    if (value) {
+    if (typeof value === 'boolean') {
+      this.storage.setItem(key, JSON.stringify(value))
+    } else if (value) {
       this.storage.setItem(key, JSON.stringify(value))
     }
   }
