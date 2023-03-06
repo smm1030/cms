@@ -60,7 +60,7 @@
 </template>
 
 <script setup lang="ts">
-import usePermissions from '@/hooks/usePermissions';
+import usePermissions from '@/hooks/usePermissions'
 import type { ElForm } from 'element-plus'
 import { reactive, ref } from 'vue'
 // 定义自定义事件/接收的属性

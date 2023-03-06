@@ -47,7 +47,7 @@
 
 <script setup lang="ts">
 import { LOGIN_TOKEN } from '@/global/constants'
-import useLoginStore from '@/store/login/login';
+import useLoginStore from '@/store/login/login'
 import { localCache } from '@/utils/cache'
 import {
   CircleClose,
