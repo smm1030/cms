@@ -31,6 +31,7 @@ const useSystemStore = defineStore('system', {
       // 1.删除数据
 
       const deleteResult = await deleteUserById(id)
+      console.log(deleteResult)
 
       // 2.重新请求新的数据
       this.postUsersListAction({ offset: 0, size: 10 })
@@ -50,6 +51,7 @@ const useSystemStore = defineStore('system', {
     async editUserDataAction(id: number, userInfo: any) {
       // 1.更新用户数据
       const editResult = await editUserData(id, userInfo)
+      console.log(editResult)
 
       // 2.重新请求新的数据
       this.postUsersListAction({ offset: 0, size: 10 })
@@ -67,6 +69,7 @@ const useSystemStore = defineStore('system', {
       // 1.删除数据
 
       const deleteResult = await deletePageById(pageName, id)
+      console.log(deleteResult)
 
       // 2.重新请求新的数据
       this.postPageListAction(pageName, { offset: 0, size: 10 })

@@ -9,7 +9,6 @@ import type { IAccount } from '@/types'
 import { localCache } from '@/utils/cache'
 import { mapMenusToPermissions, mapMenusToRoutes } from '@/utils/map-menus'
 import { defineStore } from 'pinia'
-import type { RouteRecordRaw } from 'vue-router'
 import useMainStore from '../main/main'
 
 interface IloginState {
