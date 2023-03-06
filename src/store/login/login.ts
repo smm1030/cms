@@ -7,25 +7,30 @@ import {
 } from '@/service/login/login'
 import type { IAccount } from '@/types'
 import { localCache } from '@/utils/cache'
+import { mapMenusToPermissions, mapMenusToRoutes } from '@/utils/map-menus'
 import { defineStore } from 'pinia'
 import type { RouteRecordRaw } from 'vue-router'
+import useMainStore from '../main/main'
 
 interface IloginState {
   token: string
   userInfo: any
   userMenus: any
+  permissions: string[]
 }
 const useLoginStore = defineStore('login', {
   // 如何指定state的类型
   state: (): IloginState => ({
-    token: localCache.getCache(LOGIN_TOKEN) ?? '',
-    userInfo: localCache.getCache('userInfo') ?? {},
-    userMenus: localCache.getCache('userMenus') ?? []
+    token: '',
+    userInfo: {},
+    userMenus: [],
+    permissions: []
   }),
   actions: {
     async loginAccountAction(account: IAccount) {
       // 1. 账号登录， 获取token等信息
       const loginResult = await accountLoginRequest(account)
+      console.log(loginResult)
 
       const id = loginResult.data.id
       this.token = loginResult.data.token
@@ -44,24 +49,42 @@ const useLoginStore = defineStore('login', {
       localCache.setCache('userInfo', userInfo)
       localCache.setCache('userMenus', userMenus)
 
+      // 5.请求所有roles/departments数据
+      const mainStore = useMainStore()
+      mainStore.fetchEntireDataAction()
+
+      // 重要: 获取登录用户所有按钮权限
+      const permissions = mapMenusToPermissions(userMenus)
+      this.permissions = permissions
       // 重要: 动态添加路由
-      const localRoutes: RouteRecordRaw[] = []
-      // 1.1 读取router/main所有的ts文件
-      const files: Record<string, any> = import.meta.glob(
-        '../../router/main/**/*.ts',
-        {
-          eager: true
-        }
-      )
-      // 1.2 将加载的对象放到localRoutes
-      for (const key in files) {
-        const module = files[key]
-        localRoutes.push(module.default)
-      }
-      console.log(localRoutes)
+      const routes = mapMenusToRoutes(userMenus)
+      routes.forEach((route) => router.addRoute('main', route))
 
       // 5.页面跳转(main)
       router.push('/main')
+    },
+
+    loadLocalCacheAction() {
+      // 1.用户进行刷新默认加载数据
+      const token = localCache.getCache(LOGIN_TOKEN)
+      const userInfo = localCache.getCache('userInfo')
+      const userMenus = localCache.getCache('userMenus')
+      if (token && userInfo && userMenus) {
+        this.token = token
+        this.userInfo = userInfo
+        this.userMenus = userMenus
+
+        // 1.请求所有roles/departments数据
+        const mainStore = useMainStore()
+        mainStore.fetchEntireDataAction()
+
+        // 重要: 获取登录用户所有按钮权限
+        const permissions = mapMenusToPermissions(userMenus)
+        this.permissions = permissions
+        // 2.动态添加路由
+        const routes = mapMenusToRoutes(userMenus)
+        routes.forEach((route) => router.addRoute('main', route))
+      }
     }
   }
 })
